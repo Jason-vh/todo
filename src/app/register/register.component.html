@@ -1,7 +1,7 @@
 <div class="uk-container">
   <div class="uk-card uk-card-default uk-card-body uk-position-center" style="width: 500px">
     <img src="assets/logo.png" alt="Logo" style="width: 120px" class="uk-align-center">
-    <h3 class="uk-heading-divider">Login</h3>
+    <h3 class="uk-heading-divider">Register</h3>
     <div class="uk-margin">
       Email Address
       <input class="uk-input" type="email" placeholder="Email address" [formControl]='email'>
@@ -11,16 +11,16 @@
       <input class="uk-input" type="password" placeholder="Password" [formControl]='password'>
     </div>
     <hr>
-    <button (click)="login()" class="uk-button uk-button-primary uk-width-1-1">Login</button>
+    <button (click)="register()" class="uk-button uk-button-primary uk-width-1-1">Register</button>
     <p class="uk-text-center" style="margin-top: 4px">
       <small>
-        Don't have an account? <a routerLink="/register">Register</a>.
+        Have an account? <a routerLink="/login">Login</a>.
       </small>
     </p>
   </div>
 </div>
 
-<div id="loginLoadingModal" uk-modal="esc-close: false; bg-close: false">
+<div id="registerLoadingModal" uk-modal="esc-close: false; bg-close: false">
   <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical" style="width: max-content">
     <div uk-spinner></div>
     <span>&nbsp;&nbsp;Working...</span>

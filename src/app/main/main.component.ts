@@ -1,8 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
-import { FormControl } from '@angular/forms';
-import { map } from 'rxjs/operators';
+import { Component } from '@angular/core'
+import { FormControl } from '@angular/forms'
+import { Router } from '@angular/router';
+
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
+
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore'
+import { AngularFireAuth } from '@angular/fire/auth';
 
 import 'uikit'
 
@@ -11,73 +15,72 @@ import 'uikit'
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.scss']
 })
-export class MainComponent implements OnInit {
-  title = new FormControl('');
-  project = new FormControl('');
-  text = new FormControl('');
+export class MainComponent {
+  // The FireStore collection
+  private tasks: AngularFirestoreCollection<any>
+  user = null
 
+  // Form controls
+  title = new FormControl('')
+  project = new FormControl('')
+  text = new FormControl('')
 
-  // private itemDoc: AngularFirestoreDocument<Item>;
-  // item: Observable<any>;
-  // constructor(private afs: AngularFirestore) {
-  //   this.itemDoc = afs.doc<any>('items/1');
-  //   this.item = this.itemDoc.valueChanges();
-  // }
-  // update(item: any) {
-  //   this.itemDoc.update(item);
-  // }
+  items: Observable<any[]> = null
 
+  constructor(private afs: AngularFirestore, private afAuth: AngularFireAuth, private router: Router) {
+    // Get collection
+    this.tasks = null
 
+    const user = this.afAuth.user.subscribe(user => {
+      if (user == null) {
+        this.router.navigate(['/login'])
+        return
+      }
 
-  private itemsCollection: AngularFirestoreCollection<any>;
-  items: Observable<any[]>;
-  constructor(private afs: AngularFirestore) {
-    this.itemsCollection = afs.collection<any>('todo')
-    console.log(this.itemsCollection)
-    this.items = this.itemsCollection.snapshotChanges();
+      this.user = {
+        email: user.email
+      }
 
-    this.items = this.itemsCollection.snapshotChanges().pipe(
-      map(actions => actions.map(a => {
-        const data = a.payload.doc.data();
-        const id = a.payload.doc.id;
-        return { id, ...data };
-      }))
-    );
-  }
-  addItem(item: any) {
-    this.itemsCollection.add(item);
-  }
+      this.tasks = this.afs.collection<any>(`todo/${user.uid}/tasks`)
 
-  ngOnInit() {
-
-    console.log('hi')
+      // Create subscription and transform items, removing all metadata except for the ID
+      this.items = this.tasks.snapshotChanges().pipe(
+        map(actions => actions.map(a => {
+          const data = a.payload.doc.data()
+          const id = a.payload.doc.id
+          return { id, ...data }
+        }))
+      )
+    })
   }
 
+  /** Create a new task */
   save() {
-    console.log(this.project.value)
-    console.log(this.title.value)
-    console.log(this.text.value)
-
-    this.itemsCollection.add({
+    this.tasks.add({
       title: this.title.value,
       project: this.project.value,
       text: this.text.value
     })
 
+    // UI feedback
     UIkit.modal('#newTaskModal').hide()
     const uikit:any = UIkit
-
     uikit.notification("Task created", {status: 'success', pos: 'bottom-center'})
   }
 
+  /** Delete a task */
   delete(item) {
-    console.log(item)
-    const doc = this.itemsCollection.doc(item.id)
+    // Fetch reference to document
+    const doc = this.tasks.doc(item.id)
 
     doc.delete()
 
+    // UI feedback
     const uikit:any = UIkit
-
     uikit.notification("Task deleted", {status: 'success', pos: 'bottom-center'})
+  }
+
+  logout() {
+    this.afAuth.auth.signOut()
   }
 }

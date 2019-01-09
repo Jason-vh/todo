@@ -1,12 +1,24 @@
-<nav class="uk-navbar-container uk-margin" uk-navbar>
+<nav class="uk-navbar-container uk-margin" uk-navbar *ngIf="user != null">
   <div class="uk-navbar-left">
-    <a class="uk-navbar-item uk-logo" href="#">Todo</a>
+    <a href="/">
+      <img src="assets/logo.png" alt="Logo" style="width: 100px" class="uk-margin-left">
+    </a>
+  </div>
+  <div class="uk-navbar-center">
+    <div class="uk-navbar-item">
+      <small class="text-muted">{{ user.email }}</small>
+    </div>
   </div>
   <div class="uk-navbar-right">
     <ul class="uk-navbar-nav">
       <li>
-        <a uk-toggle="target: #newTaskModal">
-          New Task
+        <a class="uk-text-primary" uk-toggle="target: #newTaskModal">
+          + New Task
+        </a>
+      </li>
+      <li>
+        <a class="uk-text-secondary" (click)="logout()">
+          Logout
         </a>
       </li>
     </ul>
@@ -15,14 +27,15 @@
 
 <br>
 <br>
-<div class="uk-container">
+<div class="uk-container" *ngIf="items | async as fetchedItems">
   <h1 class="uk-heading-divider">Tasks</h1>
-  <div class="uk-card uk-card-default uk-margin-small uk-animation-slide-bottom-small" *ngFor="let item of items | async">
+  <div uk-alert class="uk-alert-primary uk-text-center" *ngIf="fetchedItems.length == 0">It looks like you have no tasks. <a uk-toggle="target: #newTaskModal">Add one?</a></div>
+  <div class="uk-card uk-card-small uk-card-default uk-margin-bottom-small uk-animation-slide-bottom-small" *ngFor="let item of fetchedItems">
     <div class="uk-card-body">
       <h3 class="uk-card-title">{{ item.title }}</h3>
-      <div class="uk-card-badge uk-label uk-margin-small-right">{{ item.project }}</div>
-      <p>{{ item.text }}</p>
-      <span (click)="delete(item)" style="cursor: pointer;" class="uk-position-top-right uk-padding-small uk-text-danger" uk-icon="icon: close; ratio: 0.8"></span>
+      <div class="uk-card-badge uk-label uk-position-center-right uk-margin-large-right">{{ item.project }}</div>
+      {{ item.text }}
+      <span (click)="delete(item)" style="cursor: pointer;" class="uk-position-center-right uk-padding-small uk-text-danger" uk-icon="icon: trash; ratio: 0.8"></span>
     </div>
   </div>
 </div>

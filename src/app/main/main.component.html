@@ -1,0 +1,55 @@
+<nav class="uk-navbar-container uk-margin" uk-navbar>
+  <div class="uk-navbar-left">
+    <a class="uk-navbar-item uk-logo" href="#">Todo</a>
+  </div>
+  <div class="uk-navbar-right">
+    <ul class="uk-navbar-nav">
+      <li>
+        <a uk-toggle="target: #newTaskModal">
+          New Task
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<br>
+<br>
+<div class="uk-container">
+  <h1 class="uk-heading-divider">Tasks</h1>
+  <div class="uk-card uk-card-default uk-margin-small uk-animation-slide-bottom-small" *ngFor="let item of items | async">
+    <div class="uk-card-body">
+      <h3 class="uk-card-title">{{ item.title }}</h3>
+      <div class="uk-card-badge uk-label uk-margin-small-right">{{ item.project }}</div>
+      <p>{{ item.text }}</p>
+      <span (click)="delete(item)" style="cursor: pointer;" class="uk-position-top-right uk-padding-small uk-text-danger" uk-icon="icon: close; ratio: 0.8"></span>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal -->
+<div id="newTaskModal" uk-modal>
+  <div class="uk-modal-dialog">
+    <div class="uk-modal-body">
+      <h2 class="uk-modal-title">New Task</h2>
+      <button class="uk-modal-close-default" type="button" uk-close></button>
+      <div class="uk-grid-small" uk-grid>
+        <div class="uk-width-1-2@s">
+          <div class="uk-margin">
+            <input class="uk-input" type="text" placeholder="Title" [formControl]="title">
+          </div>
+        </div>
+        <div class="uk-width-1-2@s">
+          <div class="uk-margin">
+            <input class="uk-input" type="text" placeholder="Project" [formControl]="project">
+          </div>
+        </div>
+      </div>
+      <div class="uk-margin">
+        <textarea class="uk-textarea" placeholder="Text" [formControl]="text"></textarea>
+      </div>
+      <button (click)="save()" class="uk-button uk-button-default uk-width-1-1">Save</button>
+    </div>
+  </div>
+</div>
